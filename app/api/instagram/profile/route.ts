@@ -1,15 +1,12 @@
-// app/api/instagram/profile/route.ts  (or wherever your route lives)
 import { type NextRequest, NextResponse } from "next/server";
 import { spawn } from "child_process";
 import path from "path";
 
 function getPythonCandidates() {
-  // allow override from env
   if (process.env.PYTHON_PATH && process.env.PYTHON_PATH.trim()) {
     return [process.env.PYTHON_PATH];
   }
 
-  // typical candidates (Windows usually 'python', Linux/Mac often 'python3')
   if (process.platform === "win32") {
     return ["python", "py", "python3"];
   }
@@ -47,15 +44,12 @@ export async function POST(request: NextRequest) {
         python.stderr.on("data", (d) => (stderr += d.toString()));
 
         python.on("error", (err) => {
-          // usually ENOENT when executable not found
           console.error(`Spawn error for '${cmd}':`, err && err.message);
           lastError = err;
-          // if there are more candidates, try next
           if (tried < candidates.length) {
             trySpawn(candidates[tried]);
             return;
           }
-          // all candidates exhausted -> return meaningful error
           resolve(
             NextResponse.json(
               { error: "Python not found or failed to start", details: err && err.message },
@@ -68,7 +62,6 @@ export async function POST(request: NextRequest) {
           if (code !== 0) {
             console.error(`Python exited with code ${code}`);
             console.error("stderr:", stderr);
-            // if there are more candidates, maybe try next (in case alternate py installer available)
             if (tried < candidates.length) {
               trySpawn(candidates[tried]);
               return;
@@ -91,7 +84,6 @@ export async function POST(request: NextRequest) {
           }
         });
 
-        // safety timeout per spawn (in case script hangs)
         const timeout = setTimeout(() => {
           try {
             python.kill();
@@ -99,7 +91,7 @@ export async function POST(request: NextRequest) {
           resolve(NextResponse.json({ error: "Python script timeout" }, { status: 408 }));
         }, 30000);
         python.on("close", () => clearTimeout(timeout));
-      }; // trySpawn
+      };
 
       trySpawn(candidates[0]);
     });
