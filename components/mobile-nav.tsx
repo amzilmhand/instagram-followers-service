@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Users } from "lucide-react"
+import { Menu, Users, Gift, Trophy } from "lucide-react"
 import Link from "next/link"
 
 export default function MobileNav() {
@@ -51,32 +51,30 @@ export default function MobileNav() {
             >
               Reviews
             </Link>
-            <Link
-              href="/competition"
-              className="text-lg text-gray-600 hover:text-blue-600 transition-colors py-2"
-              onClick={closeNav}
-            >
-              Competition
-            </Link>
+            
             <Link
               href="/free-followers"
-              className="text-lg text-blue-600 font-medium hover:text-blue-700 transition-colors py-2"
               onClick={closeNav}
             >
-              Free Followers
+              <Button
+                  className="w-full sm:w-auto h-12 justify-start sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Gift className="w-5 h-5 mr-3" />
+                  Get Free 1K Followers 
+                </Button>
             </Link>
+             <Link href="/competition" className="flex-1 sm:flex-none">
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto h-12 justify-start sm:h-14 border-2 border-purple-400 text-purple-700 hover:bg-purple-50 px-6 sm:px-8 text-base sm:text-lg font-semibold rounded-xl transition-all"
+                >
+                  <Trophy className="w-5 h-5 mr-3" />
+                  Win 50K Followers
+                </Button>
+              </Link>
           </nav>
 
-          <div className="mt-auto space-y-3 pt-8 border-t">
-            <Link href="/sign-in" onClick={closeNav}>
-              <Button variant="outline" className="w-full bg-transparent">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/sign-up" onClick={closeNav}>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">Get Started</Button>
-            </Link>
-          </div>
+        
         </div>
       </SheetContent>
     </Sheet>

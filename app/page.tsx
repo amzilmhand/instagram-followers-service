@@ -29,11 +29,7 @@ export default function HomePage() {
               <Link href="/reviews" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
                 Reviews
               </Link>
-              <Link href="/sign-in">
-                <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
-                  Sign In
-                </Button>
-              </Link>
+              
             </nav>
             <MobileNav />
           </div>

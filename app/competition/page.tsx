@@ -49,11 +49,7 @@ export default function CompetitionPage() {
               <Link href="/reviews" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Reviews
               </Link>
-              <Link href="/auth/login">
-                <Button variant="outline" size="sm">
-                  Sign In
-                </Button>
-              </Link>
+              
             </nav>
           </div>
         </div>
@@ -62,28 +58,32 @@ export default function CompetitionPage() {
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-amber-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <Badge className="mb-6 bg-gradient-to-r from-purple-100 to-amber-100 text-purple-800 border-purple-200">
               <Trophy className="w-4 h-4 mr-1" />
-              Monthly Competition
+              Weekly Competition
             </Badge>
             <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6">
               Win{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-amber-600">
-                50,000 Followers
+                50K Followers
               </span>
               <br />
-              Every Month!
+              Every Week!
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Enter our monthly competition for a chance to win 50,000 Instagram followers absolutely free. New winners
-              every month!
+              Enter our weekly competition for a chance to win 50K Instagram followers absolutely free. New winners
+              every week!
             </p>
 
             {/* Countdown Timer */}
-            <div className="flex justify-center items-center space-x-4 mb-8">
+            <div className="flex flex-col md:flex-row  justify-center items-center space-x-4 mb-4 gap-4 md:gap-0">
+                      <div className="flex items-center gap-2">
+
               <Clock className="w-6 h-6 text-purple-600" />
               <span className="text-lg font-semibold text-gray-700">Next Draw In:</span>
+                          </div>
+
               <div className="flex space-x-2">
                 <div className="bg-purple-600 text-white px-3 py-2 rounded-lg font-bold">15</div>
                 <span className="text-gray-500">:</span>

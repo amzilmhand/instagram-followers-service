@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,6 +25,13 @@ interface UserProfile {
   isPrivate: boolean
 }
 
+declare global {
+  interface Window {
+    eJuaF_dOi_WZzLdc: any
+    _JF: any
+  }
+}
+
 export default function FreeFollowersPage() {
   const [currentStep, setCurrentStep] = useState<Step>("input")
   const [email, setEmail] = useState("")
@@ -32,6 +39,25 @@ export default function FreeFollowersPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // Load AdBlueMedia content locker script
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Set the configuration
+      window.eJuaF_dOi_WZzLdc = { "it": 4500583, "key": "a0bf0" }
+      
+      // Load the script
+      const script = document.createElement('script')
+      script.src = 'https://d167xx758yszc9.cloudfront.net/c584292.js'
+      script.async = true
+      document.head.appendChild(script)
+      
+      return () => {
+        // Cleanup
+        document.head.removeChild(script)
+      }
+    }
+  }, [])
 
   const steps = [
     { id: "input", title: "Enter Details", completed: currentStep !== "input" },
@@ -84,10 +110,45 @@ export default function FreeFollowersPage() {
   }
 
   const handleSecurityCheck = () => {
-    // This would integrate with adbluemedia content locker
-    // For demo purposes, we'll simulate the process
-    window.open("https://example.com/content-locker", "_blank")
-    setCurrentStep("success")
+    // Initialize AdBlueMedia content locker
+    if (typeof window !== 'undefined' && (window as any)._JF) {
+      (window as any)._JF({
+        onComplete: () => {
+          // Content locker completed successfully
+          setCurrentStep("success")
+          // Here you could also send the completion to your API
+          handleCompleteFollowers()
+        },
+        onClose: () => {
+          // User closed the content locker without completing
+          console.log('Content locker closed')
+        }
+      })
+    } else {
+      // Fallback if script not loaded
+      console.error('AdBlueMedia content locker not available')
+      // For development/testing, proceed to success
+      setCurrentStep("success")
+    }
+  }
+
+  const handleCompleteFollowers = async () => {
+    try {
+      const response = await fetch('/api/user/claim-followers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          instagramUsername: username,
+          email: email 
+        })
+      })
+      
+      if (response.ok) {
+        console.log('Followers claim request sent successfully')
+      }
+    } catch (error) {
+      console.error('Error claiming followers:', error)
+    }
   }
 
   const renderInputStep = () => (
