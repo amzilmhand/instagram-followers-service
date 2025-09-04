@@ -9,14 +9,15 @@ function generateReferralCode(): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = auth()
+    const { userId } = await auth()
     const user = await currentUser()
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { referredBy } = await request.json()
+    const body = await request.json().catch(() => ({}))
+    const { referredBy } = body
 
     const client = await clientPromise
     const db = client.db("instaboost")
