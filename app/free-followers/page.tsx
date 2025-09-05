@@ -7,8 +7,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Gift, Search, Shield, CheckCircle, Users, ArrowLeft, Clock, Lock, Trophy } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Gift, Search, Shield, CheckCircle, Users, ArrowLeft, Clock, Lock, Trophy, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { generateDeviceFingerprint } from "@/lib/blocking"
+import Image from "next/image"
 
 type Step = "input" | "verification" | "security" | "success"
 
@@ -29,12 +32,31 @@ export default function FreeFollowersPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [blockingReason, setBlockingReason] = useState("")
+  const [hoursRemaining, setHoursRemaining] = useState(0)
+  const [deviceFingerprint, setDeviceFingerprint] = useState("")
 
-  // Load content locker script
+  // Generate device fingerprint on mount
   useEffect(() => {
-    if (typeof window !== 'undefined' && currentStep === "security") {
+    if (typeof window !== 'undefined') {
+      const fingerprint = generateDeviceFingerprint()
+      setDeviceFingerprint(fingerprint)
+    }
+  }, [])
+
+  // Load content locker script with user tracking
+  useEffect(() => {
+    if (typeof window !== 'undefined' && currentStep === "security" && username && deviceFingerprint) {
+      // Set up postback parameters with username and device fingerprint
       const script1 = document.createElement('script')
-      script1.innerHTML = 'var PAqPm_DTV_NtFssc={"it":4500583,"key":"a0bf0"};'
+      script1.innerHTML = `var PAqPm_DTV_NtFssc={
+        "it":4500583,
+        "key":"a0bf0",
+        "s1":"${username}",
+        "s2":"${deviceFingerprint}",
+        "postback_url":"${window.location.origin}/api/postback"
+      };`
       document.head.appendChild(script1)
 
       const script2 = document.createElement('script')
@@ -42,12 +64,23 @@ export default function FreeFollowersPage() {
       script2.async = true
       document.head.appendChild(script2)
 
+      // Override completion handler to just close locker
+      ;(window as any).contentLockerComplete = () => {
+        // Close the content locker instead of redirecting
+        if (typeof (window as any)._Xy_close === 'function') {
+          (window as any)._Xy_close()
+        }
+        // The postback will handle the completion tracking
+        setCurrentStep("success")
+      }
+
       return () => {
         document.head.removeChild(script1)
         document.head.removeChild(script2)
+        delete (window as any).contentLockerComplete
       }
     }
-  }, [currentStep])
+  }, [currentStep, username, deviceFingerprint])
 
   const steps = [
     { id: "input", title: "Enter Details", completed: currentStep !== "input" },
@@ -75,6 +108,32 @@ export default function FreeFollowersPage() {
     setError("")
 
     try {
+      // First check if user is blocked
+      const blockingResponse = await fetch('/api/check-blocking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'free-followers',
+          instagramUsername: username,
+          ipAddress: '', // Will be detected server-side
+          deviceFingerprint: deviceFingerprint,
+          countryCode: 'US' // You can enhance this with geolocation
+        })
+      })
+
+      const blockingData = await blockingResponse.json()
+      
+      if (blockingData.isBlocked) {
+        setIsBlocked(true)
+        setBlockingReason(blockingData.reason || 'You have already claimed your free followers today')
+        setHoursRemaining(blockingData.hoursRemaining || 24)
+        setIsLoading(false)
+        return
+      }
+
+      // If not blocked, proceed with Instagram profile fetch
       const response = await fetch("/api/instagram/profile", {
         method: "POST",
         headers: {
@@ -162,10 +221,23 @@ export default function FreeFollowersPage() {
           </div>
         )}
 
+        {isBlocked && (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Daily Limit Reached</strong><br />
+              {blockingReason}. You can get free followers again in {hoursRemaining} hours.
+              <div className="mt-2 text-sm text-amber-700">
+                Try again tomorrow or check out our premium packages for instant followers.
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Button
           onClick={handleSearchAccount}
-          disabled={!email || !username || isLoading}
-          className="w-full h-12 sm:h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mt-6"
+          disabled={!email || !username || isLoading || isBlocked}
+          className="w-full h-12 sm:h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
@@ -192,11 +264,13 @@ export default function FreeFollowersPage() {
       <CardContent className="space-y-6">
         {userProfile && (
           <div className="text-center">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white shadow-lg">
-              <img
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4">
+              <Image
                 src={userProfile?.profileImage || "/placeholder.jpg"}
                 alt="Profile"
-                className="w-full h-full object-cover"
+                fill
+                className="rounded-full object-cover border-4 border-white shadow-lg"
+                sizes="(max-width: 640px) 96px, 112px"
               />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900">@{userProfile.username}</h3>

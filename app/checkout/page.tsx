@@ -4,12 +4,27 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Users, CreditCard, Shield, CheckCircle, ArrowLeft, Clock, Star, Lock, AlertCircle } from "lucide-react"
+import { Users, CreditCard, Shield, CheckCircle, ArrowLeft, Clock, Star, Lock, AlertCircle, Search, Zap } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import Image from "next/image"
+
+type Step = "input" | "verification" | "checkout" | "success"
+
+interface UserProfile {
+  username: string
+  profileImage: string
+  followers: number
+  following: number
+  posts: number
+  fullName: string
+  isPrivate: boolean
+}
 
 interface Package {
   id: string
@@ -26,12 +41,15 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams()
   const packageId = searchParams.get("package") || "professional"
 
+  const [currentStep, setCurrentStep] = useState<Step>("input")
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
-  const [instagramUsername, setInstagramUsername] = useState("")
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("paypal")
-  const [orderComplete, setOrderComplete] = useState(false)
 
   const packages: Package[] = [
     {
@@ -80,8 +98,61 @@ export default function CheckoutPage() {
     }
   }, [packageId])
 
+  const steps = [
+    { id: "input", title: "Enter Details", completed: currentStep !== "input" },
+    { id: "verification", title: "Verify Account", completed: ["checkout", "success"].includes(currentStep) },
+    { id: "checkout", title: "Payment", completed: currentStep === "success" },
+    { id: "success", title: "Complete", completed: false },
+  ]
+
+  const currentStepIndex = steps.findIndex((step) => step.id === currentStep)
+  const progress = ((currentStepIndex + 1) / steps.length) * 100
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value
+    value = value.replace(/[@\\s]/g, "").toLowerCase()
+    setUsername(value)
+  }
+
+  const handleSearchAccount = async () => {
+    if (!username || !email) {
+      setError('Please fill in all fields')
+      return
+    }
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch("/api/instagram/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: username.replace("@", "") }),
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch profile")
+      }
+
+      setUserProfile(data.profile)
+      setCurrentStep("verification")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to find Instagram account")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleVerifyAccount = () => {
+    setCurrentStep("checkout")
+  }
+
   const handlePayment = async () => {
-    if (!instagramUsername || !email) {
+    if (!username || !email) {
       return
     }
 
@@ -93,8 +164,8 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: selectedPackage.price,
-          packageName: selectedPackage.name
+          amount: selectedPackage?.price,
+          packageName: selectedPackage?.name
         })
       })
 
@@ -117,59 +188,149 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePayPalPayment = handlePayment
+  const renderInputStep = () => (
+    <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+      <CardHeader className="text-center pb-6">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+        </div>
+        <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Account Details</CardTitle>
+        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Enter your details to start your order</p>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div>
+          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+            Email Address *
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="your.email@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-12 text-base mt-2"
+            disabled={isLoading}
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="username" className="text-sm font-medium text-gray-700">
+            Instagram Username *
+          </Label>
+          <div className="relative mt-2">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-base">@</span>
+            <Input
+              id="username"
+              type="text"
+              placeholder="yourusername"
+              value={username}
+              onChange={handleUsernameChange}
+              className="h-12 text-base pl-8"
+              maxLength={30}
+              disabled={isLoading}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1 px-1">Enter your username without the @ symbol</p>
+        </div>
 
-  if (orderComplete) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <Card>
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <CardTitle className="text-2xl text-green-600">Payment Successful!</CardTitle>
-              <p className="text-gray-600">Your order has been confirmed</p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="text-center">
-                  <p className="font-medium text-green-900 mb-2">
-                    {selectedPackage?.followers.toLocaleString()} followers will be delivered to
-                  </p>
-                  <p className="text-lg font-bold text-green-800">@{instagramUsername}</p>
-                  <div className="flex items-center justify-center mt-3 text-green-700">
-                    <Clock className="w-4 h-4 mr-1" />
-                    <span className="text-sm">Within {selectedPackage?.deliveryTime}</span>
-                  </div>
-                </div>
-              </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-700 text-sm font-medium">{error}</p>
+          </div>
+        )}
 
-              <div className="space-y-3">
-                <Link href="/dashboard">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    <Users className="w-4 h-4 mr-2" />
-                    Go to Dashboard
-                  </Button>
-                </Link>
-                <Link href="/">
-                  <Button variant="outline" className="w-full bg-transparent">
-                    Back to Home
-                  </Button>
-                </Link>
-              </div>
+        <Button
+          onClick={handleSearchAccount}
+          disabled={!email || !username || isLoading}
+          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mt-6"
+        >
+          {isLoading ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+              Searching Account...
+            </>
+          ) : (
+            <>
+              <Search className="w-5 h-5 mr-3" />
+              Find My Account
+            </>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
+  )
 
+  const renderVerificationStep = () => (
+    <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+      <CardHeader className="text-center pb-6">
+        <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Verify Your Account</CardTitle>
+        <p className="text-gray-600 text-sm sm:text-base">Is this your Instagram account?</p>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {userProfile && (
+          <div className="text-center">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4">
+              <Image
+                src={userProfile?.profileImage || "/placeholder.jpg"}
+                alt="Profile"
+                fill
+                className="rounded-full object-cover border-4 border-white shadow-lg"
+                sizes="(max-width: 640px) 96px, 112px"
+              />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">@{userProfile.username}</h3>
+            {userProfile.fullName && <p className="text-gray-600 mb-4 text-sm sm:text-base">{userProfile.fullName}</p>}
+            
+            <div className="grid grid-cols-3 gap-4 mt-6 p-5 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
               <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  Order confirmation sent to <span className="font-medium">{email}</span>
+                <div className="font-bold text-lg sm:text-xl text-gray-900">{userProfile.posts.toLocaleString()}</div>
+                <div className="text-xs sm:text-sm text-gray-600 font-medium">Posts</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg sm:text-xl text-blue-600">{userProfile.followers.toLocaleString()}</div>
+                <div className="text-xs sm:text-sm text-gray-600 font-medium">Followers</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg sm:text-xl text-gray-900">{userProfile.following.toLocaleString()}</div>
+                <div className="text-xs sm:text-sm text-gray-600 font-medium">Following</div>
+              </div>
+            </div>
+
+            {/* Package Preview */}
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+              <div className="text-center">
+                <h4 className="font-bold text-blue-800 mb-2">Selected Package</h4>
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <Zap className="w-5 h-5 text-blue-600" />
+                  <span className="text-lg font-bold text-blue-900">{selectedPackage?.name}</span>
+                </div>
+                <p className="text-blue-700 text-sm">
+                  +{selectedPackage?.followers.toLocaleString()} followers • ${selectedPackage?.price}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-3 mt-6">
+          <Button 
+            onClick={handleVerifyAccount} 
+            className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <CheckCircle className="w-5 h-5 mr-3" />
+            Yes, This is My Account!
+          </Button>
+          <Button 
+            onClick={() => setCurrentStep("input")} 
+            variant="outline" 
+            className="w-full h-12 sm:h-14 border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-semibold text-base sm:text-lg rounded-xl transition-all"
+          >
+            No, Try Different Username
+          </Button>
         </div>
-      </div>
-    )
-  }
+      </CardContent>
+    </Card>
+  )
 
   if (!selectedPackage) {
     return (
@@ -186,224 +347,172 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-              <span className="text-gray-600">Back to Dashboard</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Mobile-First Header */}
+      <header className="border-b border-gray-100 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div className="px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <Link href="/packages" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors">
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-base font-medium">Back</span>
             </Link>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Order</h1>
-          <p className="text-gray-600">Secure checkout powered by PayPal</p>
-        </div>
+      <div className="py-6 sm:py-8 px-4 sm:px-6">
+        <div className="max-w-lg mx-auto">
+          {/* Progress Section */}
+          <div className="mb-6 sm:mb-8">
+            <div className="text-center mb-6">
+              <Badge className="mb-4 bg-blue-100 text-blue-800 border-blue-200 px-4 py-2">
+                <Zap className="w-4 h-4 mr-2" />
+                {selectedPackage?.name} Package
+              </Badge>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Secure Checkout</h1>
+              <p className="text-sm sm:text-base text-gray-600">Get {selectedPackage?.followers.toLocaleString()} followers for ${selectedPackage?.price}</p>
+            </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Order Details */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <CreditCard className="w-5 h-5 text-blue-600" />
-                  <span>Order Details</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-6 h-6 text-blue-600" />
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-700">Progress</span>
+                <span className="text-sm font-medium text-gray-700">Step {currentStepIndex + 1} of {steps.length}</span>
+              </div>
+              <Progress value={progress} className="h-3 mb-4 bg-gray-200" />
+              
+              <div className="grid grid-cols-4 gap-2">
+                {steps.map((step, index) => (
+                  <div key={step.id} className="text-center">
+                    <div
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold mx-auto mb-2 transition-all duration-300 ${
+                        step.completed
+                          ? "bg-blue-500 text-white shadow-lg"
+                          : index === currentStepIndex
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                            : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {step.completed ? <CheckCircle className="w-4 h-4" /> : index + 1}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-blue-900">{selectedPackage.name} Package</h3>
-                      <p className="text-sm text-blue-700">{selectedPackage.followers.toLocaleString()} followers</p>
-                    </div>
-                  </div>
-                  {selectedPackage.popular && <Badge className="bg-blue-600 text-white">Most Popular</Badge>}
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-medium text-gray-900">Package Features:</h4>
-                  <ul className="space-y-1">
-                    {selectedPackage.features.map((feature, index) => (
-                      <li key={index} className="flex items-center space-x-2 text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">
-                      Delivery within {selectedPackage.deliveryTime}
+                    <span
+                      className={`text-xs font-medium block leading-tight ${
+                        step.completed || index === currentStepIndex ? "text-gray-900" : "text-gray-500"
+                      }`}
+                    >
+                      {step.title}
                     </span>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Instagram Username</label>
-                  <Input
-                    type="text"
-                    placeholder="@your_username"
-                    value={instagramUsername}
-                    onChange={(e) => setInstagramUsername(e.target.value)}
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">We'll never ask for your password</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">For order confirmation and updates</p>
-                </div>
-              </CardContent>
-            </Card>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Payment Section */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{selectedPackage.name} Package</span>
-                  <span className="font-medium">${selectedPackage.price}</span>
-                </div>
-
-                {selectedPackage.originalPrice && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Original Price</span>
-                    <span className="text-gray-500 line-through">${selectedPackage.originalPrice}</span>
+          {/* Step Content */}
+          <div className="transition-all duration-500 ease-in-out">
+            {currentStep === "input" && renderInputStep()}
+            {currentStep === "verification" && renderVerificationStep()}
+            {currentStep === "checkout" && (
+              // Original checkout content but condensed
+              <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+                <CardHeader className="text-center pb-6">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CreditCard className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
                   </div>
-                )}
-
-                <div className="flex items-center justify-between text-sm text-green-600">
-                  <span>Discount</span>
-                  <span>
-                    -${((selectedPackage.originalPrice || selectedPackage.price) - selectedPackage.price).toFixed(2)}
-                  </span>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between text-lg font-semibold">
-                  <span>Total</span>
-                  <span>${selectedPackage.price}</span>
-                </div>
-
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-4 h-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-800">
-                      Limited time offer - Save{" "}
-                      {Math.round(
-                        (((selectedPackage.originalPrice || selectedPackage.price) - selectedPackage.price) /
-                          (selectedPackage.originalPrice || selectedPackage.price)) *
-                          100,
-                      )}
-                      %
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="w-5 h-5 text-green-600" />
-                  <span>Secure Payment</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-3 border border-blue-200 rounded-lg bg-blue-50">
-                    <input
-                      type="radio"
-                      id="paypal"
-                      name="payment"
-                      value="paypal"
-                      checked={paymentMethod === "paypal"}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="text-blue-600"
-                    />
-                    <label htmlFor="paypal" className="flex items-center space-x-2 cursor-pointer">
-                      <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                        <CreditCard className="w-4 h-4 text-white" />
+                  <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Payment</CardTitle>
+                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Complete your secure payment</p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Order Summary */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="w-5 h-5 text-blue-600" />
+                        <span className="font-semibold text-blue-900">{selectedPackage?.name} Package</span>
                       </div>
-                      <span className="font-medium text-blue-900">PayPal</span>
-                    </label>
+                      {selectedPackage?.popular && <Badge className="bg-blue-600 text-white">Most Popular</Badge>}
+                    </div>
+                    <div className="text-sm text-blue-700 mb-3">
+                      {selectedPackage?.followers.toLocaleString()} followers for @{userProfile?.username}
+                    </div>
+                    <div className="flex items-center justify-between text-lg font-bold text-blue-900">
+                      <span>Total:</span>
+                      <span>${selectedPackage?.price}</span>
+                    </div>
                   </div>
-                </div>
 
-                <Button
-                  onClick={handlePayPalPayment}
-                  disabled={!instagramUsername || !email || isProcessing}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  size="lg"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating Order...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4 mr-2" />
-                      Pay with PayPal - ${selectedPackage.price}
-                    </>
-                  )}
-                </Button>
-
-                <div className="text-center space-y-2">
-                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                    <Shield className="w-4 h-4" />
-                    <span>256-bit SSL encryption</span>
+                  {/* Payment Method */}
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3 p-3 border border-blue-200 rounded-lg bg-blue-50">
+                      <input
+                        type="radio"
+                        id="paypal"
+                        name="payment"
+                        value="paypal"
+                        checked={paymentMethod === "paypal"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="text-blue-600"
+                      />
+                      <label htmlFor="paypal" className="flex items-center space-x-2 cursor-pointer">
+                        <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                          <CreditCard className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="font-medium text-blue-900">PayPal</span>
+                      </label>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500">Your payment information is secure and encrypted</p>
-                </div>
-              </CardContent>
-            </Card>
 
-            <Alert>
-              <Shield className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Money-back guarantee:</strong> If you're not satisfied with your followers within 30 days, we'll
-                provide a full refund.
-              </AlertDescription>
-            </Alert>
+                  <Button
+                    onClick={handlePayment}
+                    disabled={!username || !email || isProcessing}
+                    className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                        Creating Order...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-5 h-5 mr-3" />
+                        Pay with PayPal - ${selectedPackage?.price}
+                      </>
+                    )}
+                  </Button>
+
+                  <div className="text-center space-y-2">
+                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                      <Shield className="w-4 h-4" />
+                      <span>256-bit SSL encryption</span>
+                    </div>
+                    <p className="text-xs text-gray-500">Your payment information is secure and encrypted</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Additional Options */}
+          <div className="mt-8 space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+              <div className="text-center">
+                <h4 className="font-bold text-green-800 mb-2">Need More Followers?</h4>
+                <p className="text-green-700 text-sm mb-4">
+                  Check out our free daily followers while you wait
+                </p>
+                <Link href="/free-followers">
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                    <Star className="w-4 h-4 mr-2" />
+                    Get Free Followers
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
