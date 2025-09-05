@@ -87,18 +87,37 @@ export default function CheckoutPage() {
 
     setIsProcessing(true)
 
-    // Simulate PayPal payment processing
-    setTimeout(() => {
-      setOrderComplete(true)
+    try {
+      // Create PayPal order
+      const response = await fetch('/api/paypal/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: selectedPackage.price,
+          packageName: selectedPackage.name
+        })
+      })
+
+      const data = await response.json()
+      
+      if (response.ok && data.orderID) {
+        // Redirect to PayPal for payment
+        const approvalUrl = data.links.find((link: any) => link.rel === 'approve')?.href
+        if (approvalUrl) {
+          window.location.href = approvalUrl
+        }
+      } else {
+        throw new Error(data.error || 'Failed to create order')
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error)
+      alert('Payment failed: ' + error.message)
+    } finally {
       setIsProcessing(false)
-    }, 3000)
+    }
   }
 
-  const handlePayPalPayment = () => {
-    // In a real implementation, this would integrate with PayPal SDK
-    window.open("https://www.paypal.com/checkoutnow", "_blank")
-    handlePayment()
-  }
+  const handlePayPalPayment = handlePayment
 
   if (orderComplete) {
     return (
@@ -358,7 +377,7 @@ export default function CheckoutPage() {
                   {isProcessing ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing Payment...
+                      Creating Order...
                     </>
                   ) : (
                     <>
