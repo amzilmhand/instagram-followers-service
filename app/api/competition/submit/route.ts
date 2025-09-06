@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb, collections } from '@/lib/database'
 import { sendEmail, emailTemplates } from '@/lib/email'
-import { validateEmail } from '@/lib/email-validation'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +18,16 @@ export async function POST(request: NextRequest) {
     // Clean username (remove @ if present)
     const cleanUsername = username.replace('@', '').trim()
 
-    const db = await getDb()
+    let db
+    try {
+      db = await getDb()
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { message: 'Service temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      )
+    }
 
     // Check if user already entered competition
     const existingEntry = await db.collection(collections.competitions).findOne({

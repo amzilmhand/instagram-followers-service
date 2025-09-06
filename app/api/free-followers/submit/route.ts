@@ -1,25 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb, collections } from '@/lib/database'
 import { sendEmail, emailTemplates } from '@/lib/email'
-import { validateEmail } from '@/lib/email-validation'
 
 export async function POST(request: NextRequest) {
-  try {
-    const { username, email } = await request.json()
+   try {
+    // Safely parse JSON and log it
+    let body = null
+    try {
+      body = await request.json()
+    } catch (e) {
+      console.error('Failed to parse JSON body:', e)
+    }
+    console.log('DEBUG /api/free-followers/submit received body:', body)
+
+    const username = body?.username?.toString().trim()
+    const email = body?.email?.toString().trim()
 
     if (!username || !email) {
       return NextResponse.json(
-        { message: 'Username and email are required' },
+        { message: 'Username and email are required', received: body },
         { status: 400 }
       )
     }
-
  
 
     // Clean username (remove @ if present)
     const cleanUsername = username.replace('@', '').trim()
 
-    const db = await getDb()
+    let db
+    try {
+      db = await getDb()
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { message: 'Service temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      )
+    }
 
     // Check if user already exists (within last 24 hours to prevent spam)
     const existingUser = await db.collection(collections.users).findOne({

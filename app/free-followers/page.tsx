@@ -161,6 +161,8 @@ export default function FreeFollowersPage() {
     setIsLoading(true)
     try {
       // Submit to database when user verifies their account
+      console.log('Submitting free-followers payload', { username, email })
+
       const response = await fetch('/api/free-followers/submit', {
         method: 'POST',
         headers: {

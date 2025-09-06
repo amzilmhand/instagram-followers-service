@@ -1,10 +1,10 @@
 import { MongoClient } from "mongodb"
 
 if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+  console.warn('Warning: MONGODB_URI not set. Database operations will fail.')
 }
 
-const uri = process.env.MONGODB_URI
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/instaboost-demo'
 const options = {}
 
 let client
