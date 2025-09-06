@@ -17,7 +17,7 @@ export default function HomePage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </div>
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
               <Link href="/features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
@@ -97,7 +97,7 @@ export default function HomePage() {
         <div className="px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Why Choose InstaBoost?</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Why Choose BoostGram?</h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
                 The most trusted platform for Instagram growth with thousands of satisfied users
               </p>
@@ -121,9 +121,9 @@ export default function HomePage() {
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-amber-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
                     <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">24-Hour Delivery</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">1-Hour Delivery</h3>
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                    Fast and reliable delivery within 24 hours. Watch your follower count grow consistently every day.
+                    Fast and reliable delivery within 1 hour. Watch your follower count grow consistently every day.
                   </p>
                 </CardContent>
               </Card>
@@ -177,7 +177,7 @@ export default function HomePage() {
             <div className="text-center mb-8 sm:mb-12">
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">What Our Users Say</h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed">
-                Join thousands of satisfied Instagram users who trust InstaBoost
+                Join thousands of satisfied Instagram users who trust BoostGram
               </p>
             </div>
 
@@ -235,7 +235,7 @@ export default function HomePage() {
               Ready to Boost Your Instagram?
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-blue-100 mb-6 sm:mb-8 leading-relaxed">
-              Join over 500,000 users who are already growing their Instagram accounts with InstaBoost
+              Join over 500,000 users who are already growing their Instagram accounts with BoostGram
             </p>
             <Link href="/free-followers">
               <Button
@@ -259,7 +259,7 @@ export default function HomePage() {
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                     <Users className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-xl font-bold">InstaBoost</span>
+                  <span className="text-xl font-bold">BoostGram</span>
                 </div>
                 <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
                   The most trusted platform for Instagram growth with real followers and engagement.
@@ -285,7 +285,7 @@ export default function HomePage() {
                   </li>
                 </ul>
               </div>
-              <div>
+              {/* <div>
                 <h3 className="font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Support</h3>
                 <ul className="space-y-2 text-gray-400 text-sm sm:text-base">
                   <li>
@@ -304,8 +304,8 @@ export default function HomePage() {
                     </Link>
                   </li>
                 </ul>
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <h3 className="font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Legal</h3>
                 <ul className="space-y-2 text-gray-400 text-sm sm:text-base">
                   <li>
@@ -324,10 +324,10 @@ export default function HomePage() {
                     </Link>
                   </li>
                 </ul>
-              </div>
+              </div> */}
             </div>
             <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-4 sm:pt-6 text-center text-gray-400 text-sm sm:text-base">
-              <p>&copy; 2024 InstaBoost. All rights reserved.</p>
+              <p>&copy; 2025 BoostGram. All rights reserved.</p>
             </div>
           </div>
         </div>

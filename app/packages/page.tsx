@@ -123,7 +123,7 @@ export default function PackagesPage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
               <Link href="/features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">

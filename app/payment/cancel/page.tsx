@@ -17,7 +17,7 @@ export default function PaymentCancelPage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </Link>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function PaymentCancelPage() {
               <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-6">
                 <div className="text-center">
                   <h3 className="text-xl font-bold text-gray-900 mb-4">What Happened?</h3>
-                  <div className="space-y-3 text-sm sm:text-base text-gray-700">
+                  <div className="space-y-3 text-sm sm:text-base text-gray-700 text-left">
                     <p>• Payment was cancelled during the checkout process</p>
                     <p>• PayPal session expired or encountered an error</p>
                     <p>• Browser was closed before completing payment</p>
@@ -75,7 +75,7 @@ export default function PaymentCancelPage() {
 
               <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
                 <div className="text-center">
-                  <h4 className="font-bold text-purple-800 mb-3">🎁 Free Alternatives</h4>
+                  <h4 className="font-bold text-purple-800 mb-3">Free Alternatives</h4>
                   <p className="text-purple-700 text-sm mb-4">
                     Not ready to purchase? Try our free options while you decide
                   </p>

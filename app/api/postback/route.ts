@@ -36,8 +36,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Missing Instagram username' }, { status: 400 })
     }
 
-    const db = await getDb()
-
     // Store completion record in database
     const completionRecord = {
       offer_id: parseInt(offer_id),
@@ -56,8 +54,16 @@ export async function POST(request: NextRequest) {
 
     console.log('Offer completion recorded:', completionRecord)
 
-    // Save completion record
-    await db.collection(collections.completions).insertOne(completionRecord)
+    // Save completion record to both database and fallback storage
+    try {
+      const db = await getDb()
+      await db.collection(collections.completions).insertOne(completionRecord)
+    } catch (dbError) {
+      console.log('Database unavailable, using fallback storage')
+      // Use fallback file storage
+      const { saveCompletionRecord } = await import('@/lib/server-storage')
+      saveCompletionRecord(completionRecord)
+    }
 
     // Update user records to mark offers as completed and send emails
     const updates = await Promise.all([

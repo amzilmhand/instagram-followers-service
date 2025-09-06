@@ -22,27 +22,12 @@ export async function POST(request: NextRequest) {
     try {
       db = await getDb()
     } catch (dbError) {
-      console.error('Database connection error:', dbError)
       return NextResponse.json(
         { message: 'Service temporarily unavailable. Please try again later.' },
         { status: 503 }
       )
     }
 
-    // Check if user already entered competition
-    const existingEntry = await db.collection(collections.competitions).findOne({
-      $or: [
-        { username: cleanUsername },
-        { email: email.toLowerCase() }
-      ]
-    })
-
-    if (existingEntry) {
-      return NextResponse.json(
-        { message: 'You have already entered the competition' },
-        { status: 400 }
-      )
-    }
 
     // Store competition entry
     const competitionData = {
@@ -68,7 +53,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error submitting competition entry:', error)
     return NextResponse.json(
       { message: 'Error processing entry' },
       { status: 500 }

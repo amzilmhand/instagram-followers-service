@@ -17,7 +17,7 @@ export default function CompetitionSuccessPage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </Link>
           </div>
         </div>
@@ -35,7 +35,7 @@ export default function CompetitionSuccessPage() {
                 Entry Confirmed
               </Badge>
               <CardTitle className="text-2xl sm:text-3xl font-bold text-green-800 mb-4">
-                🎉 You're In the Competition!
+                You're In the Competition!
               </CardTitle>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
                 Congratulations! You've successfully entered the weekly competition for 50K Instagram followers.
@@ -48,15 +48,15 @@ export default function CompetitionSuccessPage() {
                   <Trophy className="w-12 h-12 text-purple-600 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-900 mb-3">What Happens Next?</h3>
                   <div className="space-y-3 text-sm sm:text-base text-gray-700">
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-start justify-start gap-2 text-left">
                       <Clock className="w-5 h-5 text-blue-600" />
-                      <span>Draw takes place every <strong>Saturday at midnight</strong></span>
+                      <span>Draw takes place every <strong>Sunday at midnight</strong></span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-start justify-start gap-2 text-left">
                       <Star className="w-5 h-5 text-amber-500" />
                       <span>Winner gets <strong>50,000 real followers</strong></span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-start justify-start gap-2 text-left">
                       <Gift className="w-5 h-5 text-green-600" />
                       <span>Followers delivered within <strong>24 hours</strong></span>
                     </div>
@@ -66,7 +66,7 @@ export default function CompetitionSuccessPage() {
 
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
                 <div className="text-center">
-                  <h4 className="font-bold text-amber-800 mb-3">💡 Pro Tip: Boost Your Chances!</h4>
+                  <h4 className="font-bold text-amber-800 mb-3">Pro Tip: Boost Your Chances!</h4>
                   <p className="text-amber-700 text-sm mb-4">
                     While you wait for the draw, grow your account with our guaranteed services
                   </p>

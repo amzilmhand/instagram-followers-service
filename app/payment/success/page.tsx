@@ -36,7 +36,7 @@ function PaymentSuccessContent() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </Link>
           </div>
         </div>
@@ -54,7 +54,7 @@ function PaymentSuccessContent() {
                 Payment Successful
               </Badge>
               <CardTitle className="text-2xl sm:text-3xl font-bold text-green-800 mb-4">
-                🎉 Order Confirmed!
+              Order Confirmed!
               </CardTitle>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
                 Thank you for your purchase! Your {packageDetails.followers} followers are being processed.
@@ -99,15 +99,15 @@ function PaymentSuccessContent() {
                   <Zap className="w-12 h-12 text-green-600 mx-auto mb-4" />
                   <h4 className="font-bold text-green-800 mb-3">What Happens Next?</h4>
                   <div className="space-y-2 text-sm sm:text-base text-green-700">
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-start justify-start gap-2 text-left">
                       <Clock className="w-4 h-4" />
                       <span>Followers will be delivered within <strong>{packageDetails.delivery}</strong></span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-start justify-start gap-2 text-left">
                       <Users className="w-4 h-4" />
                       <span>All followers are <strong>real and active</strong> accounts</span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-start justify-start gap-2 text-left">
                       <CheckCircle className="w-4 h-4" />
                       <span>Delivery is <strong>100% safe</strong> for your account</span>
                     </div>
@@ -117,7 +117,7 @@ function PaymentSuccessContent() {
 
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
                 <div className="text-center">
-                  <h4 className="font-bold text-amber-800 mb-3">💡 Keep Growing!</h4>
+                  <h4 className="font-bold text-amber-800 mb-3">Keep Growing!</h4>
                   <p className="text-amber-700 text-sm mb-4">
                     Continue building your Instagram presence with our other services
                   </p>

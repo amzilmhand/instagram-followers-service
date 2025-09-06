@@ -10,7 +10,7 @@ export default function ReviewsPage() {
       name: "Sarah Johnson",
       username: "@sarahj_lifestyle",
       rating: 5,
-      text: "Incredible service! I've been using InstaBoost for 3 months and my follower count has grown from 2K to 15K. The free daily followers really work, and when I needed a quick boost for a campaign, their premium packages delivered exactly as promised.",
+      text: "Incredible service! I've been using BoostGram for 3 months and my follower count has grown from 2K to 15K. The free daily followers really work, and when I needed a quick boost for a campaign, their premium packages delivered exactly as promised.",
       followers: "15.2K",
       verified: true,
       date: "2 days ago",
@@ -19,7 +19,7 @@ export default function ReviewsPage() {
       name: "Mike Chen",
       username: "@mikec_photography",
       rating: 5,
-      text: "As a photographer, having a strong Instagram presence is crucial for my business. InstaBoost helped me reach 10K followers in just 2 months. The followers are real and actually engage with my content. Highly recommend!",
+      text: "As a photographer, having a strong Instagram presence is crucial for my business. BoostGram helped me reach 10K followers in just 2 months. The followers are real and actually engage with my content. Highly recommend!",
       followers: "12.8K",
       verified: true,
       date: "1 week ago",
@@ -28,7 +28,7 @@ export default function ReviewsPage() {
       name: "Emma Rodriguez",
       username: "@emma_fitness",
       rating: 5,
-      text: "I was skeptical at first, but InstaBoost proved me wrong. The free followers service is amazing - 1000 real followers every day! I also bought the Professional package and got 10K followers in less than 24 hours. Customer support is excellent too.",
+      text: "I was skeptical at first, but BoostGram proved me wrong. The free followers service is amazing - 1000 real followers every day! I also bought the Professional package and got 10K followers in less than 24 hours. Customer support is excellent too.",
       followers: "28.5K",
       verified: true,
       date: "3 days ago",
@@ -46,7 +46,7 @@ export default function ReviewsPage() {
       name: "Lisa Park",
       username: "@lisapark_travel",
       rating: 5,
-      text: "Best Instagram growth service I've ever used! The delivery is always on time, followers are genuine, and the dashboard makes it easy to track everything. I've recommended InstaBoost to all my influencer friends.",
+      text: "Best Instagram growth service I've ever used! The delivery is always on time, followers are genuine, and the dashboard makes it easy to track everything. I've recommended BoostGram to all my influencer friends.",
       followers: "22.1K",
       verified: true,
       date: "1 day ago",
@@ -55,7 +55,7 @@ export default function ReviewsPage() {
       name: "Alex Martinez",
       username: "@alexm_tech",
       rating: 5,
-      text: "Outstanding results! I run a tech review channel and needed to grow my Instagram to match my YouTube success. InstaBoost delivered 50K followers through their Business package in just 8 hours. Incredible!",
+      text: "Outstanding results! I run a tech review channel and needed to grow my Instagram to match my YouTube success. BoostGram delivered 50K followers through their Business package in just 8 hours. Incredible!",
       followers: "67.3K",
       verified: true,
       date: "4 days ago",
@@ -79,7 +79,7 @@ export default function ReviewsPage() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">InstaBoost</span>
+              <span className="text-xl font-bold text-gray-900">BoostGram</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-8">
               <Link href="/features" className="text-gray-600 hover:text-blue-600 transition-colors">
@@ -113,7 +113,7 @@ export default function ReviewsPage() {
               What Our <span className="text-blue-600">Customers Say</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Read real reviews from over 500,000 satisfied customers who have grown their Instagram with InstaBoost
+              Read real reviews from over 500,000 satisfied customers who have grown their Instagram with BoostGram
             </p>
           </div>
 
@@ -198,7 +198,7 @@ export default function ReviewsPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Join Our Happy Customers</h2>
           <p className="text-xl text-blue-100 mb-8">
-            Start your Instagram growth journey today and see why 500,000+ users trust InstaBoost
+            Start your Instagram growth journey today and see why 500,000+ users trust BoostGram
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/free-followers">

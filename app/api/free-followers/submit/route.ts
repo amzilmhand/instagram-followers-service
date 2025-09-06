@@ -38,24 +38,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already exists (within last 24 hours to prevent spam)
-    const existingUser = await db.collection(collections.users).findOne({
-      $or: [
-        { username: cleanUsername },
-        { email: email.toLowerCase() }
-      ],
-      type: 'free',
-      createdAt: { 
-        $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
-      }
-    })
-
-    if (existingUser) {
-      return NextResponse.json(
-        { message: 'You can only claim free followers once every 24 hours' },
-        { status: 400 }
-      )
-    }
+  
 
     // Store user data
     const userData = {
@@ -102,7 +85,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error submitting free followers request:', error)
     return NextResponse.json(
       { message: 'Error processing request' },
       { status: 500 }

@@ -15,7 +15,7 @@ export default function FeaturesPage() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">InstaBoost</span>
+              <span className="text-xl font-bold text-gray-900">BoostGram</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-8">
               <Link href="/features" className="text-blue-600 font-medium">
@@ -38,7 +38,7 @@ export default function FeaturesPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-white">
+      <section className="pt-20 pb-4 bg-gradient-to-br from-blue-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <Badge className="mb-6 bg-blue-100 text-blue-800 border-blue-200">
@@ -49,7 +49,7 @@ export default function FeaturesPage() {
               Everything You Need to <span className="text-blue-600">Grow Your Instagram</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover all the powerful features that make InstaBoost the #1 choice for Instagram growth
+              Discover all the powerful features that make BoostGram the #1 choice for Instagram growth
             </p>
           </div>
         </div>

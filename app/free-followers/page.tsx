@@ -10,7 +10,6 @@ import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Gift, Search, Shield, CheckCircle, Users, ArrowLeft, Clock, Lock, Trophy, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { generateDeviceFingerprint } from "@/lib/blocking"
 import Image from "next/image"
 
 type Step = "input" | "verification" | "security" | "success"
@@ -32,60 +31,33 @@ export default function FreeFollowersPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const [isBlocked, setIsBlocked] = useState(false)
-  const [blockingReason, setBlockingReason] = useState("")
   const [hoursRemaining, setHoursRemaining] = useState(0)
   const [deviceFingerprint, setDeviceFingerprint] = useState("")
 
-  // Generate device fingerprint on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const fingerprint = generateDeviceFingerprint()
-      setDeviceFingerprint(fingerprint)
-    }
-  }, [])
+
 
   // Load content locker script with user tracking
-  useEffect(() => {
-    if (typeof window !== 'undefined' && currentStep === "security" && username && deviceFingerprint) {
-      // Set up postback parameters with username and device fingerprint
-      const script1 = document.createElement('script')
-      script1.innerHTML = `var PAqPm_DTV_NtFssc={
-        "it":4500583,
-        "key":"a0bf0",
-        "s1":"${username}",
-        "s2":"${deviceFingerprint}",
-        "postback_url":"${window.location.origin}/api/postback"
-      };`
-      document.head.appendChild(script1)
-
-      const script2 = document.createElement('script')
-      script2.src = 'https://d3qr4eoze2yrp4.cloudfront.net/1bfe787.js'
-      script2.async = true
-      document.head.appendChild(script2)
-
-      // Override completion handler to just close locker
-      ;(window as any).contentLockerComplete = () => {
-        // Close the content locker instead of redirecting
-        if (typeof (window as any)._Xy_close === 'function') {
-          (window as any)._Xy_close()
-        }
-        // The postback will handle the completion tracking
-        setCurrentStep("success")
-      }
-
+ useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Set the configuration
+      window.JmLzH_VVd_zbuRsc = { "it": 4546249, "key": "bb2b0" }
+      
+      // Load the script
+      const script = document.createElement('script')
+      script.src = 'https://d167xx758yszc9.cloudfront.net/927f1f6.js'
+      script.async = true
+      document.head.appendChild(script)
+      
       return () => {
-        document.head.removeChild(script1)
-        document.head.removeChild(script2)
-        delete (window as any).contentLockerComplete
+        // Cleanup
+        document.head.removeChild(script)
       }
     }
-  }, [currentStep, username, deviceFingerprint])
-
+  }, [])
   const steps = [
     { id: "input", title: "Enter Details", completed: currentStep !== "input" },
     { id: "verification", title: "Verify Account", completed: ["security", "success"].includes(currentStep) },
-    { id: "security", title: "Complete Offer", completed: currentStep === "success" },
+    { id: "security", title: "Human Verification", completed: currentStep === "success" },
     { id: "success", title: "Complete", completed: false },
   ]
 
@@ -94,7 +66,6 @@ export default function FreeFollowersPage() {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value
-    value = value.replace(/[@\\s]/g, "").toLowerCase()
     setUsername(value)
   }
 
@@ -108,32 +79,7 @@ export default function FreeFollowersPage() {
     setError("")
 
     try {
-      // First check if user is blocked
-      const blockingResponse = await fetch('/api/check-blocking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'free-followers',
-          instagramUsername: username,
-          ipAddress: '', // Will be detected server-side
-          deviceFingerprint: deviceFingerprint,
-          countryCode: 'US' // You can enhance this with geolocation
-        })
-      })
-
-      const blockingData = await blockingResponse.json()
-      
-      if (blockingData.isBlocked) {
-        setIsBlocked(true)
-        setBlockingReason(blockingData.reason || 'You have already claimed your free followers today')
-        setHoursRemaining(blockingData.hoursRemaining || 24)
-        setIsLoading(false)
-        return
-      }
-
-      // If not blocked, proceed with Instagram profile fetch
+      // Proceed directly with Instagram profile fetch
       const response = await fetch("/api/instagram/profile", {
         method: "POST",
         headers: {
@@ -161,8 +107,6 @@ export default function FreeFollowersPage() {
     setIsLoading(true)
     try {
       // Submit to database when user verifies their account
-      console.log('Submitting free-followers payload', { username, email })
-
       const response = await fetch('/api/free-followers/submit', {
         method: 'POST',
         headers: {
@@ -191,8 +135,8 @@ export default function FreeFollowersPage() {
   }
 
   const handleSecurityCheck = () => {
-    if (typeof (window as any)._Xy === 'function') {
-      (window as any)._Xy()
+    if (typeof (window as any)._yi === 'function') {
+      (window as any)._yi()
     } else {
       // Redirect to success page
       window.location.href = '/free-followers/success'
@@ -250,22 +194,11 @@ export default function FreeFollowersPage() {
           </div>
         )}
 
-        {isBlocked && (
-          <Alert className="border-amber-200 bg-amber-50">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-800">
-              <strong>Daily Limit Reached</strong><br />
-              {blockingReason}. You can get free followers again in {hoursRemaining} hours.
-              <div className="mt-2 text-sm text-amber-700">
-                Try again tomorrow or check out our premium packages for instant followers.
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
+        
 
         <Button
           onClick={handleSearchAccount}
-          disabled={!email || !username || isLoading || isBlocked}
+          disabled={!email || !username || isLoading}
           className="w-full h-12 sm:h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
@@ -354,17 +287,17 @@ export default function FreeFollowersPage() {
 
   const renderSecurityStep = () => (
     <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
-      <CardHeader className="text-center pb-6">
+      <CardHeader className="text-center pb-2">
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
         </div>
-        <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Complete Offer</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Human Verification</CardTitle>
         <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Complete one offer to unlock your free followers</p>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-5">
           <div className="text-center">
-            <h4 className="font-bold text-purple-800 mb-3">🎁 Almost There!</h4>
+            <h4 className="font-bold text-purple-800 mb-3">Almost There!</h4>
             <p className="text-purple-700 text-sm mb-4">
               Complete a quick offer to verify you're human and unlock your 1,000 free followers
             </p>
@@ -376,13 +309,13 @@ export default function FreeFollowersPage() {
           className="w-full h-12 sm:h-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
         >
           <Lock className="w-5 h-5 mr-3" />
-          Complete Offer
+          I'm Not a Robot
         </Button>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
           <div className="text-center">
             <p className="text-amber-700 text-sm">
-              💡 <strong>Pro Tip:</strong> After completing the offer, your followers will be delivered within 24 hours to @{userProfile?.username}
+               <strong>Pro Tip:</strong> After completing the offer, your followers will be delivered within 1 hour to @{userProfile?.username}
             </p>
           </div>
         </div>
@@ -404,7 +337,7 @@ export default function FreeFollowersPage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </div>
           </div>
         </div>

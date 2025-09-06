@@ -367,18 +367,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Package Preview */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
-              <div className="text-center">
-                <h4 className="font-bold text-blue-800 mb-2">Selected Package</h4>
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <Zap className="w-5 h-5 text-blue-600" />
-                  <span className="text-lg font-bold text-blue-900">{selectedPackage?.name}</span>
-                </div>
-                <p className="text-blue-700 text-sm">
-                  +{selectedPackage?.followers.toLocaleString()} followers • ${selectedPackage?.price}
-                </p>
-              </div>
-            </div>
+            
           </div>
         )}
 
@@ -430,7 +419,7 @@ export default function CheckoutPage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InstaBoost</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BoostGram</span>
             </div>
           </div>
         </div>
