@@ -7,13 +7,13 @@ import Link from "next/link"
 export default function PackagesPage() {
   const packages = [
     {
-      name: "Starter",
-      price: "$9.99",
-      followers: "5,000",
-      icon: Zap,
-      color: "blue",
+      name: "Basic",
+      price: "$2.00",
+      followers: "1,000",
+      icon: Users,
+      color: "green",
       features: [
-        "5,000 Real Followers",
+        "1,000 Real Followers",
         "24-48 Hour Delivery",
         "Basic Support",
         "Safe & Secure",
@@ -22,36 +22,92 @@ export default function PackagesPage() {
       popular: false,
     },
     {
-      name: "Professional",
-      price: "$17.99",
+      name: "Starter",
+      price: "$8.00",
+      followers: "5,000",
+      icon: Zap,
+      color: "blue",
+      features: [
+        "5,000 Real Followers",
+        "12-24 Hour Delivery",
+        "Basic Support",
+        "Safe & Secure",
+        "No Password Required",
+        "Growth Analytics",
+      ],
+      popular: false,
+    },
+    {
+      name: "Popular",
+      price: "$15.00",
       followers: "10,000",
       icon: Crown,
       color: "purple",
       features: [
         "10,000 Real Followers",
-        "12-24 Hour Delivery",
+        "6-12 Hour Delivery",
         "Priority Support",
         "Safe & Secure",
         "No Password Required",
-        "Growth Analytics",
+        "Advanced Analytics",
+        "Engagement Boost",
       ],
       popular: true,
     },
     {
-      name: "Business",
-      price: "$79.99",
-      followers: "50,000",
-      icon: Rocket,
+      name: "Pro",
+      price: "$35.00",
+      followers: "25,000",
+      icon: Star,
       color: "amber",
       features: [
-        "50,000 Real Followers",
-        "6-12 Hour Delivery",
+        "25,000 Real Followers",
+        "3-6 Hour Delivery",
         "VIP Support",
         "Safe & Secure",
         "No Password Required",
         "Advanced Analytics",
         "Targeted Followers",
         "Engagement Boost",
+      ],
+      popular: false,
+    },
+    {
+      name: "Business",
+      price: "$65.00",
+      followers: "50,000",
+      icon: Rocket,
+      color: "red",
+      features: [
+        "50,000 Real Followers",
+        "1-3 Hour Delivery",
+        "VIP Support",
+        "Safe & Secure",
+        "No Password Required",
+        "Premium Analytics",
+        "Targeted Followers",
+        "Engagement Boost",
+        "Account Growth Strategy",
+      ],
+      popular: false,
+    },
+    {
+      name: "Enterprise",
+      price: "$120.00",
+      followers: "100,000",
+      icon: Crown,
+      color: "violet",
+      features: [
+        "100,000 Real Followers",
+        "Instant Delivery",
+        "24/7 VIP Support",
+        "Safe & Secure",
+        "No Password Required",
+        "Premium Analytics",
+        "Highly Targeted Followers",
+        "Maximum Engagement Boost",
+        "Personal Account Manager",
+        "Growth Strategy Consultation",
       ],
       popular: false,
     },
@@ -111,7 +167,7 @@ export default function PackagesPage() {
       <section className="py-8 sm:py-16">
         <div className="px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {packages.map((pkg, index) => {
                 const IconComponent = pkg.icon
                 return (
@@ -133,20 +189,32 @@ export default function PackagesPage() {
                     <CardHeader className="text-center pb-4 px-4 sm:px-6 pt-6">
                       <div
                         className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                          pkg.color === "blue" 
-                            ? "bg-gradient-to-r from-blue-100 to-blue-200" 
-                            : pkg.color === "purple" 
-                              ? "bg-gradient-to-r from-purple-100 to-purple-200" 
-                              : "bg-gradient-to-r from-amber-100 to-orange-200"
+                          pkg.color === "green" 
+                            ? "bg-gradient-to-r from-green-100 to-emerald-200" 
+                            : pkg.color === "blue" 
+                              ? "bg-gradient-to-r from-blue-100 to-blue-200" 
+                              : pkg.color === "purple" 
+                                ? "bg-gradient-to-r from-purple-100 to-purple-200" 
+                                : pkg.color === "amber"
+                                  ? "bg-gradient-to-r from-amber-100 to-orange-200"
+                                  : pkg.color === "red"
+                                    ? "bg-gradient-to-r from-red-100 to-rose-200"
+                                    : "bg-gradient-to-r from-violet-100 to-purple-200"
                         }`}
                       >
                         <IconComponent
                           className={`w-8 h-8 sm:w-10 sm:h-10 ${
-                            pkg.color === "blue"
-                              ? "text-blue-600"
-                              : pkg.color === "purple"
-                                ? "text-purple-600"
-                                : "text-amber-600"
+                            pkg.color === "green"
+                              ? "text-green-600"
+                              : pkg.color === "blue"
+                                ? "text-blue-600"
+                                : pkg.color === "purple"
+                                  ? "text-purple-600"
+                                  : pkg.color === "amber"
+                                    ? "text-amber-600"
+                                    : pkg.color === "red"
+                                      ? "text-red-600"
+                                      : "text-violet-600"
                           }`}
                         />
                       </div>

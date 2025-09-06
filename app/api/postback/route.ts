@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { saveCompletionRecord } from '@/lib/server-storage'
+import { getDb, collections } from '@/lib/database'
+import { sendEmail, emailTemplates } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,6 +36,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Missing Instagram username' }, { status: 400 })
     }
 
+    const db = await getDb()
+
     // Store completion record in database
     const completionRecord = {
       offer_id: parseInt(offer_id),
@@ -53,11 +56,101 @@ export async function POST(request: NextRequest) {
 
     console.log('Offer completion recorded:', completionRecord)
 
-    // Save to storage
-    const saved = saveCompletionRecord(completionRecord)
-    
-    if (!saved) {
-      throw new Error('Failed to save completion record')
+    // Save completion record
+    await db.collection(collections.completions).insertOne(completionRecord)
+
+    // Update user records to mark offers as completed and send emails
+    const updates = await Promise.all([
+      // Update free users
+      db.collection(collections.users).updateMany(
+        { 
+          username: instagramUsername,
+          type: 'free',
+          completedOffer: false
+        },
+        { 
+          $set: { 
+            completedOffer: true,
+            offerCompletedAt: completionTime
+          }
+        }
+      ),
+      // Update competition entries
+      db.collection(collections.competitions).updateMany(
+        { 
+          username: instagramUsername,
+          completedOffer: false
+        },
+        { 
+          $set: { 
+            completedOffer: true,
+            offerCompletedAt: completionTime
+          }
+        }
+      )
+    ])
+
+    // Send notification emails for completed offers
+    try {
+      // Check for free users who completed offers
+      const freeUsers = await db.collection(collections.users).find({
+        username: instagramUsername,
+        type: 'free',
+        completedOffer: true,
+        emailSent: { $ne: true }
+      }).toArray()
+
+      // Check for competition entries who completed offers  
+      const competitionEntries = await db.collection(collections.competitions).find({
+        username: instagramUsername,
+        completedOffer: true,
+        emailSent: { $ne: true }
+      }).toArray()
+
+      // Send emails for free followers
+      for (const user of freeUsers) {
+        const template = emailTemplates.offerCompleted(user.username)
+        await sendEmail(user.email, template, 'offer_completed_free')
+        // Mark email as sent
+        await db.collection(collections.users).updateOne(
+          { _id: user._id },
+          { $set: { emailSent: true } }
+        )
+      }
+
+      // Send emails for competition entries (different message)
+      for (const entry of competitionEntries) {
+        const template = emailTemplates.competitionJoined(entry.username, entry.email)
+        template.subject = '🏆 Offer Completed - You\'re in the Competition!'
+        template.html = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #7c3aed;">Offer Completed Successfully!</h2>
+            <p>Great news ${entry.username}!</p>
+            <p>You've successfully completed the offer and you're now entered in this week's <strong>50,000 Followers Competition</strong>!</p>
+            <div style="background: #faf5ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #6b21a8;">Competition Details:</h3>
+              <ul>
+                <li><strong>Prize:</strong> 50,000 Instagram Followers</li>
+                <li><strong>Your Entry:</strong> @${entry.username}</li>
+                <li><strong>Status:</strong> ✅ Confirmed</li>
+              </ul>
+            </div>
+            <p>Winner will be announced this Saturday! Good luck!</p>
+            <p>Best regards,<br>The InstaBoost Team</p>
+          </div>
+        `
+        template.text = `Offer Completed! ${entry.username}, you're now entered in the 50K followers competition. Winner announced Saturday!`
+        
+        await sendEmail(entry.email, template, 'offer_completed_competition')
+        // Mark email as sent
+        await db.collection(collections.competitions).updateOne(
+          { _id: entry._id },
+          { $set: { emailSent: true } }
+        )
+      }
+    } catch (emailError) {
+      console.error('Error sending completion emails:', emailError)
+      // Don't fail the postback if email fails
     }
 
     return NextResponse.json({ 

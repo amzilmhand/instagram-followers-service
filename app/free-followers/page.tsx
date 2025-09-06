@@ -157,8 +157,35 @@ export default function FreeFollowersPage() {
     }
   }
 
-  const handleVerifyAccount = () => {
-    setCurrentStep("security")
+  const handleVerifyAccount = async () => {
+    setIsLoading(true)
+    try {
+      // Submit to database when user verifies their account
+      const response = await fetch('/api/free-followers/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Failed to register for free followers')
+        return
+      }
+
+      // Success - proceed to security step
+      setCurrentStep("security")
+    } catch (err) {
+      setError('Failed to register. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSecurityCheck = () => {
@@ -295,11 +322,21 @@ export default function FreeFollowersPage() {
 
         <div className="space-y-3 mt-6">
           <Button 
-            onClick={handleVerifyAccount} 
-            className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={handleVerifyAccount}
+            disabled={isLoading}
+            className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
-            <CheckCircle className="w-5 h-5 mr-3" />
-            Yes, This is My Account!
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                Registering...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-5 h-5 mr-3" />
+                Yes, This is My Account!
+              </>
+            )}
           </Button>
           <Button 
             onClick={() => setCurrentStep("input")} 
@@ -352,7 +389,7 @@ export default function FreeFollowersPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-amber-50 to-blue-50">
       {/* Mobile-First Header */}
       <header className="border-b border-gray-100 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="px-4 sm:px-6">

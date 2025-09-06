@@ -10,17 +10,17 @@ export async function GET(request: NextRequest) {
 
     const db = await getDb()
     
-    // Get recent competition entries, sorted by creation date
-    const competitions = await db.collection(collections.competitions)
+    // Get recent orders, sorted by creation date
+    const orders = await db.collection(collections.orders)
       .find({})
       .sort({ createdAt: -1 })
       .limit(50)
       .toArray()
 
-    return NextResponse.json(competitions)
+    return NextResponse.json(orders)
 
   } catch (error) {
-    console.error('Error fetching competitions:', error)
-    return NextResponse.json({ message: 'Error fetching competitions' }, { status: 500 })
+    console.error('Error fetching orders:', error)
+    return NextResponse.json({ message: 'Error fetching orders' }, { status: 500 })
   }
 }

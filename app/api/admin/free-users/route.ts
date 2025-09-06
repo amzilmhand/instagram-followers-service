@@ -10,17 +10,17 @@ export async function GET(request: NextRequest) {
 
     const db = await getDb()
     
-    // Get recent competition entries, sorted by creation date
-    const competitions = await db.collection(collections.competitions)
-      .find({})
+    // Get recent free users, sorted by creation date
+    const freeUsers = await db.collection(collections.users)
+      .find({ type: 'free' })
       .sort({ createdAt: -1 })
       .limit(50)
       .toArray()
 
-    return NextResponse.json(competitions)
+    return NextResponse.json(freeUsers)
 
   } catch (error) {
-    console.error('Error fetching competitions:', error)
-    return NextResponse.json({ message: 'Error fetching competitions' }, { status: 500 })
+    console.error('Error fetching free users:', error)
+    return NextResponse.json({ message: 'Error fetching free users' }, { status: 500 })
   }
 }

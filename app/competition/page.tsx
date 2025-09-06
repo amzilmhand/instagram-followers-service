@@ -76,7 +76,7 @@ function CountdownTimer({ targetDate }: { targetDate: Date }) {
 function getNextSaturday(): Date {
   const now = new Date()
   const nextSaturday = new Date()
-  const daysUntilSaturday = (6 - now.getDay()) % 7 || 7
+  const daysUntilSaturday = (7 - now.getDay()) % 7 || 7
   nextSaturday.setDate(now.getDate() + daysUntilSaturday)
   nextSaturday.setHours(0, 0, 0, 0)
   return nextSaturday
@@ -212,8 +212,35 @@ export default function CompetitionPage() {
     }
   }
 
-  const handleVerifyAccount = () => {
-    setCurrentStep("security")
+  const handleVerifyAccount = async () => {
+    setIsLoading(true)
+    try {
+      // Submit to database when user verifies their account
+      const response = await fetch('/api/competition/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Failed to enter competition')
+        return
+      }
+
+      // Success - proceed to security step
+      setCurrentStep("security")
+    } catch (err) {
+      setError('Failed to enter competition. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSecurityCheck = () => {
@@ -231,8 +258,8 @@ export default function CompetitionPage() {
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-purple-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Trophy className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
         </div>
-        <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Enter Competition</CardTitle>
-        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Enter your details to join the weekly competition for 50K followers</p>
+        <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Enter Giveaway</CardTitle>
+        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Enter your details to join the weekly Giveaway for 50K followers</p>
       </CardHeader>
       <CardContent className="space-y-5">
         <div>
@@ -283,7 +310,7 @@ export default function CompetitionPage() {
               <strong>Entry Not Allowed</strong><br />
               {blockingReason}. Try with a different Instagram username.
               <div className="mt-2 text-sm text-red-700">
-                Each username can only enter the competition once.
+                Each username can only enter the giveaway once.
               </div>
             </AlertDescription>
           </Alert>
@@ -350,11 +377,21 @@ export default function CompetitionPage() {
 
         <div className="space-y-3 mt-6">
           <Button 
-            onClick={handleVerifyAccount} 
-            className="w-full h-12 sm:h-14 bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={handleVerifyAccount}
+            disabled={isLoading}
+            className="w-full h-12 sm:h-14 bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-700 hover:to-amber-700 text-white font-semibold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
-            <CheckCircle className="w-5 h-5 mr-3" />
-            Yes, This is My Account!
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                Entering giveaway...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-5 h-5 mr-3" />
+                Yes, This is My Account!
+              </>
+            )}
           </Button>
           <Button 
             onClick={() => setCurrentStep("input")} 
@@ -375,14 +412,14 @@ export default function CompetitionPage() {
           <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
         </div>
         <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">Complete Offer</CardTitle>
-        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Complete one offer to enter the competition</p>
+        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Complete one offer to enter the giveaway</p>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="bg-gradient-to-r from-purple-50 to-amber-50 border border-purple-200 rounded-xl p-5">
           <div className="text-center">
             <h4 className="font-bold text-purple-800 mb-3">🏆 Almost There!</h4>
             <p className="text-purple-700 text-sm mb-4">
-              Complete a quick offer to verify you're human and enter the competition for 50K followers
+              Complete a quick offer to verify you're human and enter the giveaway for 50K followers
             </p>
           </div>
         </div>
@@ -398,7 +435,7 @@ export default function CompetitionPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
           <div className="text-center">
             <p className="text-amber-700 text-sm">
-              💡 <strong>Pro Tip:</strong> After completing the offer, you'll be entered into this week's competition for @{userProfile?.username}
+              💡 <strong>Pro Tip:</strong> After completing the offer, you'll be entered into this week's giveaway for @{userProfile?.username}
             </p>
           </div>
         </div>
@@ -406,11 +443,38 @@ export default function CompetitionPage() {
     </Card>
   )
 
-  const winners = [
+  const [winners, setWinners] = useState([
     { name: "Jessica M.", username: "@jessica_style", followers: "50,000", prize: "Grand Prize" },
     { name: "Carlos R.", username: "@carlos_fitness", followers: "25,000", prize: "2nd Place" },
     { name: "Amy L.", username: "@amy_travel", followers: "10,000", prize: "3rd Place" },
-  ]
+  ])
+
+  // Load winners from database
+  useEffect(() => {
+    const loadWinners = async () => {
+      try {
+        const response = await fetch('/api/admin/winners')
+        if (response.ok) {
+          const dbWinners = await response.json()
+          if (dbWinners.length > 0) {
+            // Map database winners to display format
+            const formattedWinners = dbWinners.map((winner: any) => ({
+              name: winner.username,
+              username: `@${winner.username}`,
+              followers: winner.followers,
+              prize: winner.prize
+            }))
+            setWinners(formattedWinners)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading winners:', error)
+        // Keep default winners if there's an error
+      }
+    }
+
+    loadWinners()
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-amber-50 to-blue-50">
@@ -439,10 +503,10 @@ export default function CompetitionPage() {
             <div className="text-center mb-6">
               <Badge className="mb-4 bg-purple-100 text-purple-800 border-purple-200 px-4 py-2">
                 <Trophy className="w-4 h-4 mr-2" />
-                Weekly Competition
+                Weekly giveaway
               </Badge>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Win 50K Followers</h1>
-              <p className="text-sm sm:text-base text-gray-600">Enter the weekly competition for 50,000 followers</p>
+              <p className="text-sm sm:text-base text-gray-600">Enter the weekly giveaway for 50,000 followers</p>
               
               {/* Countdown Timer */}
               <div className="mt-6">

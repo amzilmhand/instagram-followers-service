@@ -46,7 +46,7 @@ export default function HomePage() {
             </Badge>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-              Get <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">1,000 Free Followers</span>
+              Get <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">1K Free Followers</span>
               <br className="hidden sm:block" />
               <span className="sm:hidden"> </span>Every 24 Hours
             </h1>
@@ -61,7 +61,7 @@ export default function HomePage() {
                   className="w-full sm:w-auto h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <Gift className="w-5 h-5 mr-3" />
-                  Get Your Free Followers Now
+                  Get Free 1K Followers Daily
                 </Button>
               </Link>
               <Link href="/packages" className="flex-1 sm:flex-none">
@@ -79,7 +79,7 @@ export default function HomePage() {
                   className="w-full sm:w-auto h-12 sm:h-14 border-2 border-purple-400 text-purple-700 hover:bg-purple-50 px-6 sm:px-8 text-base sm:text-lg font-semibold rounded-xl transition-all"
                 >
                   <Trophy className="w-5 h-5 mr-3" />
-                  Win 50,000 Followers
+                  50K Followers Giveaway
                 </Button>
               </Link>
             </div>
@@ -111,7 +111,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Completely Free Service</h3>
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                    Get 1,000 real followers every 24 hours without paying a single penny. No hidden costs or subscriptions.
+                    Get 1K followers every 24 hours without paying a single penny. No hidden costs or subscriptions.
                   </p>
                 </CardContent>
               </Card>
@@ -186,7 +186,7 @@ export default function HomePage() {
                 {
                   name: "Alex Johnson",
                   username: "@alexj_photo",
-                  text: "Amazing service! I've been getting 1,000 followers every day for the past month. My engagement has increased dramatically!",
+                  text: "Amazing service! I've been getting 1K followers every day for the past month. My engagement has increased dramatically!",
                   rating: 5,
                 },
                 {
@@ -280,7 +280,7 @@ export default function HomePage() {
                   </li>
                   <li>
                     <Link href="/competition" className="hover:text-white transition-colors">
-                      Competition
+                      Giveaway
                     </Link>
                   </li>
                 </ul>
