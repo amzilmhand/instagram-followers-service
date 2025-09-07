@@ -1,0 +1,10 @@
+# robots.txt for BoostGram
+User-agent: *
+Allow: /
+
+# Crawl-delay (optional)
+Crawl-delay: 5
+
+# Sitemap location
+Sitemap: https://www.boostgram.site/sitemap.xml
+Host: https://www.boostgram.site
