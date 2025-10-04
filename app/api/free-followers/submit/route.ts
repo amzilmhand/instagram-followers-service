@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
             <li>You'll receive another email when followers are delivered</li>
           </ul>
         </div>
-        <p>Thank you for choosing InstaBoost!</p>
-        <p>Best regards,<br>The InstaBoost Team</p>
+        <p>Thank you for choosing BoostGram!</p>
+        <p>Best regards,<br>The BoostGram Team</p>
       </div>
     `
     template.text = `Registration Confirmed! Hi ${cleanUsername}! Your free followers request has been registered. Complete the offer to receive your 1,000 free followers.`

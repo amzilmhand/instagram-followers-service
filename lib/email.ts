@@ -35,8 +35,8 @@ export const emailTemplates = {
             <li>All followers are real and active accounts</li>
           </ul>
         </div>
-        <p>Thank you for choosing InstaBoost!</p>
-        <p>Best regards,<br>The InstaBoost Team</p>
+        <p>Thank you for choosing BoostGram!</p>
+        <p>Best regards,<br>The BoostGram Team</p>
       </div>
     `,
     text: `Congratulations ${username}! You've successfully completed the offer and your 1,000 free followers are being processed. Your followers will be delivered within 24-48 hours.`
@@ -58,7 +58,7 @@ export const emailTemplates = {
         </div>
         <p>We'll notify you if you win! Make sure to complete offers to increase your chances.</p>
         <p>Good luck!</p>
-        <p>Best regards,<br>The InstaBoost Team</p>
+        <p>Best regards,<br>The BoostGram Team</p>
       </div>
     `,
     text: `Welcome to the Competition ${username}! You've entered our 50,000 Followers Competition. We'll notify you if you win!`
@@ -79,8 +79,8 @@ export const emailTemplates = {
           </ul>
         </div>
         <p>Your followers will be delivered according to your package timeline. You'll receive another email when delivery begins.</p>
-        <p>Thank you for choosing InstaBoost!</p>
-        <p>Best regards,<br>The InstaBoost Team</p>
+        <p>Thank you for choosing BoostGram!</p>
+        <p>Best regards,<br>The BoostGram Team</p>
       </div>
     `,
     text: `Order Confirmed! Thank you for purchasing the ${packageName} package (${followers} followers) for @${username}.`
@@ -101,8 +101,8 @@ export const emailTemplates = {
             <li>Consider our premium packages for more growth</li>
           </ul>
         </div>
-        <p>Thank you for trusting InstaBoost with your Instagram growth!</p>
-        <p>Best regards,<br>The InstaBoost Team</p>
+        <p>Thank you for trusting BoostGram with your Instagram growth!</p>
+        <p>Best regards,<br>The BoostGram Team</p>
       </div>
     `,
     text: `Delivery Complete! We've successfully delivered ${followers} followers to @${username}.`
