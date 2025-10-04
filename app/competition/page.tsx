@@ -124,7 +124,7 @@ export default function CompetitionPage() {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value
-    value = value.replace(/[@\\s]/g, "").toLowerCase()
+    value = value.replace(/[@\s]/g, "").toLowerCase()
     setUsername(value)
   }
 
@@ -150,7 +150,7 @@ export default function CompetitionPage() {
       const data = await response.json()
       
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch profile")
+        throw new Error(data.error || "Failed to find Instagram account")
       }
 
       setUserProfile(data.profile)

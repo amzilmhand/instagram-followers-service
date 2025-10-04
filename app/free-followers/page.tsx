@@ -66,6 +66,7 @@ export default function FreeFollowersPage() {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value
+    value = value.replace(/[@\s]/g, "").toLowerCase()
     setUsername(value)
   }
 
@@ -143,6 +144,7 @@ export default function FreeFollowersPage() {
     }
   }
 
+  console.log('profile',userProfile)
   const renderInputStep = () => (
     <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
       <CardHeader className="text-center pb-6">

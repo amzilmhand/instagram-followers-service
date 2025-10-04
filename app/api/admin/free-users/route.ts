@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     const freeUsers = await db.collection(collections.users)
       .find({ type: 'free' })
       .sort({ createdAt: -1 })
-      .limit(50)
       .toArray()
 
     return NextResponse.json(freeUsers)
